@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mensaje Especial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, #ffd9e0 0%, #ffc4d1 40%, #ffb6c9 100%);
+    padding: 20px;
+  }
+
+  /* --- Decoraciones de fondo --- */
+  .bg-decor {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(4px);
+    border-radius: 26px;
+    padding: 45px 38px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 25px 50px rgba(214, 51, 132, 0.18);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .envelope-icon {
+    width: 90px;
+    margin: 0 auto 18px;
+    display: block;
+  }
+
+  .card h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 27px;
+    color: #c0296b;
+    margin-bottom: 10px;
+    letter-spacing: 0.2px;
+  }
+
+  .card p.subtitle {
+    color: #8a6b74;
+    font-size: 14.5px;
+    margin-bottom: 18px;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 18px 0;
+    color: #e79ab5;
+  }
+
+  .divider .line {
+    flex: 1;
+    max-width: 90px;
+    height: 1px;
+    background: #f0bdd0;
+  }
+
+  .input-wrap {
+    position: relative;
+    margin-bottom: 18px;
+  }
+
+  .input-wrap svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: #e78bab;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 15px 16px 15px 44px;
+    border: 1.8px solid #f3c9d6;
+    border-radius: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    color: #6b4f57;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fffafb;
+  }
+
+  input[type="text"]::placeholder, input[type="password"]::placeholder {
+    color: #cf9db0;
+  }
+
+  input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #d63384;
+    box-shadow: 0 0 0 4px rgba(214,51,132,0.1);
+  }
+
+  button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #e0538c, #c0296b);
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(192, 41, 107, 0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(192, 41, 107, 0.45);
+  }
+
+  button:active {
+    transform: translateY(0);
+  }
+
+  #error-msg {
+    color: #e63946;
+    font-size: 13.5px;
+    margin-top: 12px;
+    min-height: 18px;
+  }
+
+  .footer-note {
+    color: #a97d8b;
+    font-size: 13.5px;
+    margin-top: 4px;
+  }
+
+  #message-container {
+    display: none;
+  }
+
+  #message-container.show {
+    display: block;
+  }
+
+  #form-container.hide {
+    display: none;
+  }
+
+  .message-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    line-height: 1.7;
+    color: #5c3a44;
+    margin: 22px 0;
+    white-space: pre-wrap;
+  }
+
+  .icon-big {
+    font-size: 42px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<svg class="bg-decor" viewBox="0 0 1292 1217" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <!-- ramas decorativas -->
+  <g stroke="#f0a8bf" stroke-width="1.5" fill="none" opacity="0.55">
+    <path d="M1030 50 C1120 90 1180 160 1260 240"/>
+    <path d="M1080 90 C1110 110 1130 130 1150 150"/>
+    <path d="M1120 130 C1150 150 1170 170 1190 190"/>
+    <path d="M1000 90 C1030 60 1060 40 1090 30"/>
+    <ellipse cx="1090" cy="70" rx="22" ry="10" transform="rotate(35 1090 70)"/>
+    <ellipse cx="1130" cy="110" rx="22" ry="10" transform="rotate(35 1130 110)"/>
+    <ellipse cx="1170" cy="150" rx="22" ry="10" transform="rotate(35 1170 150)"/>
+
+    <path d="M40 1050 C120 1000 180 1080 260 1130"/>
+    <path d="M70 1080 C100 1100 130 1120 160 1150"/>
+    <ellipse cx="100" cy="1090" rx="20" ry="9" transform="rotate(-30 100 1090)"/>
+    <ellipse cx="140" cy="1130" rx="20" ry="9" transform="rotate(-30 140 1130)"/>
+    <ellipse cx="180" cy="1170" rx="20" ry="9" transform="rotate(-30 180 1170)"/>
+  </g>
+
+  <!-- destellos -->
+  <g fill="#ffffff" opacity="0.85">
+    <path d="M510 200 l4 14 14 4 -14 4 -4 14 -4 -14 -14 -4 14 -4 z"/>
+    <path d="M870 220 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3 z"/>
+    <path d="M235 1075 l4 14 14 4 -14 4 -4 14 -4 -14 -14 -4 14 -4 z"/>
+    <path d="M720 1040 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3 z"/>
+  </g>
+
+  <!-- corazones sueltos -->
+  <g stroke="#f0a8bf" stroke-width="2" fill="none" opacity="0.6">
+    <path d="M1030 680 c-6-10-20-10-24 0 -4 8 2 16 12 24 10-8 16-16 12-24z" transform="translate(0,0) scale(1.4) translate(-360,-230)"/>
+  </g>
+  <g fill="none" stroke="#f0a8bf" stroke-width="2" opacity="0.55">
+    <path d="M215 745 c-7-12-25-12-29 2 -4 12 6 22 29 40 23-18 33-28 29-40 -4-14-22-14-29-2z"/>
+  </g>
+</svg>
+
+<div class="card">
+  <div id="form-container">
+    <svg class="envelope-icon" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="22" width="84" height="54" rx="8" fill="#fce4ec" stroke="#e78bab" stroke-width="2"/>
+      <path d="M10 26 L50 54 L90 26" fill="none" stroke="#e78bab" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M40 20 C40 6 60 6 60 20 C60 30 50 34 50 40 C50 34 40 30 40 20 Z" fill="#e0538c" stroke="#c0296b" stroke-width="1.5"/>
+    </svg>
+    <h1>Tienes un mensaje especial</h1>
+    <p class="subtitle">Ingresa el código grabado en tu dije para verlo</p>
+
+    <div class="divider"><span class="line"></span>♡<span class="line"></span></div>
+
+    <div class="input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <input type="password" id="codeInput" placeholder="Escribe tu código" autocomplete="off">
+    </div>
+
+    <button onclick="checkCode()">Ver mensaje ✦</button>
+    <p id="error-msg"></p>
+
+    <div class="divider"><span class="line"></span>♡<span class="line"></span></div>
+    <p class="footer-note">Cada código es único, como tu historia. 💕</p>
+  </div>
+
+  <div id="message-container">
+    <div class="icon-big">💖</div>
+    <p class="message-text" id="messageText"></p>
+  </div>
+</div>
+
+<script>
+  // -----------------------------------------------------
+  // AQUÍ EDITAS TUS CÓDIGOS Y MENSAJES
+  // Cada código (en minúsculas) apunta a un mensaje único.
+  // Puedes agregar tantos como quieras copiando el formato.
+  // -----------------------------------------------------
+  const mensajes = {
+    "amor01": "Desde el día en que te conocí, mi vida cambió para siempre. Gracias por ser mi persona favorita. Te amo. ❤️",
+    "amistad02": "Eres de esas amistades que la vida regala solo una vez. ¡Gracias por estar siempre! 🌸",
+    "familia03": "No importa la distancia, siempre estarás en mi corazón. Te quiero mucho. 🏡",
+    "cumple04": "¡Feliz cumpleaños! Que este nuevo año esté lleno de alegría y bendiciones. 🎉"
+  };
+  // -----------------------------------------------------
+
+  function checkCode() {
+    const input = document.getElementById('codeInput').value.trim().toLowerCase();
+    const errorMsg = document.getElementById('error-msg');
+    const formContainer = document.getElementById('form-container');
+    const messageContainer = document.getElementById('message-container');
+    const messageText = document.getElementById('messageText');
+
+    if (mensajes.hasOwnProperty(input)) {
+      messageText.textContent = mensajes[input];
+      formContainer.classList.add('hide');
+      messageContainer.classList.add('show');
+    } else {
+      errorMsg.textContent = "Código incorrecto. Verifica tu dije e inténtalo de nuevo.";
+    }
+  }
+
+  // Permitir enviar con la tecla Enter
+  document.getElementById('codeInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      checkCode();
+    }
+  });
+</script>
+
+</body>
+</html>
