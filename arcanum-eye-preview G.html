@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARCANUM | Revela tu Mensaje</title>
+
+  <!-- Tipografías -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --card-bg: rgba(14, 17, 25, 0.82);
+      --border-color: rgba(212, 175, 55, 0.35);
+      --gold: #d4af37;
+      --gold-hover: #f3e5ab;
+      --text-main: #f0f2f5;
+      --text-muted: #9ba1b0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Viñeta para oscurecer bordes */
+    .vignette-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(7, 9, 14, 0) 20%, rgba(3, 4, 7, 0.85) 70%, rgba(0, 0, 0, 0.98) 100%);
+      opacity: 0.6;
+      transition: opacity 0.8s ease;
+    }
+
+    body.revealed .vignette-overlay {
+      opacity: 1;
+    }
+
+    /* Canvas para Estrellas y Niebla */
+    #space-canvas, #fog-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #space-canvas {
+      z-index: 1;
+      transition: filter 0.8s ease;
+    }
+
+    #fog-canvas {
+      z-index: 2;
+      opacity: 0.85;
+      transition: filter 0.8s ease, opacity 0.8s ease;
+    }
+
+    body.revealed #space-canvas,
+    body.revealed #fog-canvas {
+      filter: brightness(0.4);
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      transition: opacity 0.6s ease;
+    }
+
+    /* ANIMACIÓN DE RESPIRACIÓN DEL LOGO ARCANUM */
+    .brand-logo-svg {
+      width: 160px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      animation: logoBreathe 3.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes logoBreathe {
+      0% {
+        opacity: 0.75;
+        filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.2));
+      }
+      100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2.2rem 2rem;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.05);
+      position: relative;
+      z-index: 4;
+      transition: box-shadow 0.6s ease, border-color 0.6s ease;
+    }
+
+    body.revealed .card {
+      border-color: rgba(212, 175, 55, 0.5);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 45px rgba(212, 175, 55, 0.15);
+    }
+
+    .eye-wrapper {
+      width: 80px;
+      height: 50px;
+      margin: 0 auto 1.2rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .eye-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
+    }
+
+    /* ESTILO DEL HAZ DE LUZ SVG */
+    .svg-beam {
+      opacity: 0;
+      transition: opacity 0.7s ease-in-out;
+      pointer-events: none;
+    }
+
+    body.revealed .svg-beam {
+      opacity: 1;
+    }
+
+    /* TRANSICIÓN DE PÁRPADOS */
+    #eyelid-group,
+    #closed-eye-group {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    #eyelid-group {
+      opacity: 1;
+      transform: scaleY(1);
+      transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+    }
+
+    #closed-eye-group {
+      opacity: 0;
+      transform: scaleY(0.5);
+      transition: opacity 0.18s ease-in, transform 0.18s ease-in;
+    }
+
+    .eye-wrapper.closed #eyelid-group {
+      opacity: 0;
+      transform: scaleY(0.35);
+    }
+
+    .eye-wrapper.closed #closed-eye-group {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+
+    /* TRANSICIÓN DE PUPILA */
+    #pupil-group {
+      transition: transform 0.1s ease-out;
+    }
+
+    body.revealed #pupil-group {
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .card h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+      position: relative;
+      z-index: 5;
+    }
+
+    .card p.subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 1.8rem;
+      line-height: 1.5;
+      position: relative;
+      z-index: 5;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1.2rem;
+      z-index: 5;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 2.8rem;
+      background: rgba(8, 10, 14, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .input-group input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      stroke: #646c7f;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+      color: #0b0d12;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 5;
+    }
+
+    .card-footer {
+      margin-top: 1.8rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 5;
+    }
+
+    .error-msg {
+      min-height: 18px;
+      margin-top: 0.9rem;
+      font-size: 0.82rem;
+      color: #e6708a;
+    }
+
+    #message-container {
+      display: none;
+      position: relative;
+      z-index: 5;
+    }
+
+    #message-container.show {
+      display: block;
+      animation: revealFade 0.6s ease-out;
+    }
+
+    #form-container.hide {
+      display: none;
+    }
+
+    @keyframes revealFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .revealed-message {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 1.45rem;
+      line-height: 1.75;
+      color: #ffffff;
+      white-space: pre-wrap;
+      margin-bottom: 1.8rem;
+      text-shadow: 0 0 16px rgba(255, 255, 255, 1), 0 0 32px rgba(212, 175, 55, 0.8);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 0.85rem;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--gold-hover);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(212, 175, 55, 0.08);
+      border-color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="vignette-overlay"></div>
+  <canvas id="space-canvas"></canvas>
+  <canvas id="fog-canvas"></canvas>
+
+  <div class="content-wrapper">
+    
+    <header class="brand-header">
+      <svg class="brand-logo-svg" viewBox="0 0 300 130" fill="none">
+        <path d="M150 15 L120 90 H132 L150 38 L168 90 H180 L150 15 Z" fill="#D4AF37"/>
+        <ellipse cx="150" cy="52" rx="42" ry="14" stroke="#D4AF37" stroke-width="1.8" transform="rotate(-15 150 52)" fill="none"/>
+        <path d="M150 44 Q150 52 142 52 Q150 52 150 60 Q150 52 158 52 Q150 52 150 44 Z" fill="#D4AF37"/>
+        <text x="150" y="108" font-family="'Cinzel', serif" font-size="20" fill="#D4AF37" letter-spacing="8" text-anchor="middle">ARCANUM</text>
+        <line x1="80" y1="120" x2="135" y2="120" stroke="#D4AF37" stroke-width="1" opacity="0.6"/>
+        <path d="M150 115 Q150 120 145 120 Q150 120 150 125 Q150 120 155 120 Q150 120 150 115 Z" fill="#D4AF37"/>
+        <line x1="165" y1="120" x2="220" y2="120" stroke="#D4AF37" stroke-width="1" opacity="0.6"/>
+      </svg>
+    </header>
+
+    <main class="card">
+
+      <div class="eye-wrapper">
+        <svg class="eye-svg" viewBox="0 0 100 60">
+          <defs>
+            <clipPath id="eyeClip">
+              <path d="M 5 30 Q 50 -10 95 30 Q 50 70 5 30 Z"/>
+            </clipPath>
+            <linearGradient id="beamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.75"/>
+              <stop offset="40%" stop-color="#D4AF37" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/>
+            </linearGradient>
+            <radialGradient id="scleraGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="85%" stop-color="#f2ebd9"/>
+              <stop offset="100%" stop-color="#d8cdb3"/>
+            </radialGradient>
+          </defs>
+
+          <!-- HAZ DE LUZ: Vértice superior alineado con pupila abajo en (50, 42) -->
+          <polygon class="svg-beam" points="50,42 -120,320 220,320" fill="url(#beamGradient)" />
+
+          <!-- OJO ABIERTO -->
+          <g id="eyelid-group">
+            <g clip-path="url(#eyeClip)">
+              <!-- Esclerótica -->
+              <path d="M 5 30 Q 50 -10 95 30 Q 50 70 5 30 Z" fill="url(#scleraGradient)"/>
+
+              <!-- Pupila e Iris -->
+              <g id="pupil-group">
+                <circle cx="50" cy="30" r="13" fill="#D4AF37" opacity="0.95"/>
+                <circle cx="50" cy="30" r="7" fill="#07090e"/>
+                <circle cx="52" cy="27" r="2.5" fill="#FFFFFF" opacity="0.85"/>
+              </g>
+            </g>
+            <!-- Contorno del ojo -->
+            <path d="M 5 30 Q 50 -10 95 30 Q 50 70 5 30 Z" fill="none" stroke="#D4AF37" stroke-width="2.5"/>
+          </g>
+
+          <!-- OJO CERRADO -->
+          <g id="closed-eye-group" fill="none" stroke="#D4AF37" stroke-linecap="round">
+            <path d="M 8 24 Q 50 54 92 24" stroke-width="5"/>
+            <path d="M 22 33 Q 17 42 14 48" stroke-width="4.5"/>
+            <path d="M 36 39 Q 33 48 31 54" stroke-width="4.5"/>
+            <path d="M 50 41.5 Q 50 50 50 57" stroke-width="4.5"/>
+            <path d="M 64 39 Q 67 48 69 54" stroke-width="4.5"/>
+            <path d="M 78 33 Q 83 42 86 48" stroke-width="4.5"/>
+          </g>
+        </svg>
+      </div>
+
+      <h2 id="cardTitle">DESBLOQUEA EL MENSAJE</h2>
+      <p class="subtitle" id="cardSubtitle">Ingresa el código o contraseña grabado en tu dije para revelar la historia que oculta.</p>
+
+      <div id="form-container">
+        <form id="unlockForm">
+          <div class="input-group">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 2l-2 2m-1.5 1.5l-3 3m-1.5 1.5l-1.5 1.5M3 21l9-9m0 0l-1.5-1.5m1.5 1.5l1.5 1.5"/>
+            </svg>
+            <input type="text" id="codeInput" placeholder="Código de tu dije" required autocomplete="off" />
+          </div>
+
+          <button type="submit" class="btn-submit">Revelar Mensaje</button>
+          <p id="errorMsg" class="error-msg"></p>
+        </form>
+      </div>
+
+      <div id="message-container">
+        <p class="revealed-message" id="revealedMessage"></p>
+        <button type="button" class="btn-secondary" id="backBtn">Volver atrás</button>
+      </div>
+
+      <div class="card-footer">
+        Lleva contigo lo que nadie más conoce
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // --- CANVAS DE ESTRELLAS MÁS DINÁMICAS ---
+    const spaceCanvas = document.getElementById('space-canvas');
+    const ctxSpace = spaceCanvas.getContext('2d');
+    let width, height, stars = [];
+
+    function initSpaceCanvas() {
+      width = spaceCanvas.width = fogCanvas.width = window.innerWidth;
+      height = spaceCanvas.height = fogCanvas.height = window.innerHeight;
+      stars = [];
+      for (let i = 0; i < 140; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * 2 + 0.4,
+          alpha: Math.random(),
+          speedAlpha: (Math.random() * 0.02 + 0.005) * (Math.random() < 0.5 ? 1 : -1),
+          speedX: (Math.random() - 0.5) * 0.15,
+          speedY: (Math.random() - 0.5) * 0.15
+        });
+      }
+    }
+
+    function drawStars() {
+      ctxSpace.fillStyle = '#07090e';
+      ctxSpace.fillRect(0, 0, width, height);
+
+      stars.forEach(star => {
+        star.alpha += star.speedAlpha;
+        if (star.alpha >= 1 || star.alpha <= 0.05) star.speedAlpha = -star.speedAlpha;
+
+        star.x += star.speedX;
+        star.y += star.speedY;
+
+        if (star.x < 0) star.x = width;
+        if (star.x > width) star.x = 0;
+        if (star.y < 0) star.y = height;
+        if (star.y > height) star.y = 0;
+
+        ctxSpace.beginPath();
+        ctxSpace.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctxSpace.fillStyle = `rgba(255, 245, 220, ${Math.abs(star.alpha)})`;
+        ctxSpace.shadowBlur = star.size * 3;
+        ctxSpace.shadowColor = 'rgba(212, 175, 55, 0.8)';
+        ctxSpace.fill();
+        ctxSpace.shadowBlur = 0;
+      });
+    }
+
+    // --- CANVAS DE NIEBLA DINÁMICA ---
+    const fogCanvas = document.getElementById('fog-canvas');
+    const ctxFog = fogCanvas.getContext('2d');
+    let fogParticles = [];
+
+    function initFogParticles() {
+      fogParticles = [];
+      for (let i = 0; i < 18; i++) {
+        fogParticles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 250 + 150,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.25,
+          alpha: Math.random() * 0.12 + 0.03,
+          color: Math.random() < 0.3 ? 'rgba(212, 175, 55,' : 'rgba(18, 24, 38,'
+        });
+      }
+    }
+
+    function drawFog() {
+      ctxFog.clearRect(0, 0, width, height);
+
+      fogParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x - p.radius > width) p.x = -p.radius;
+        if (p.x + p.radius < 0) p.x = width + p.radius;
+        if (p.y - p.radius > height) p.y = -p.radius;
+        if (p.y + p.radius < 0) p.y = height + p.radius;
+
+        let grad = ctxFog.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+        grad.addColorStop(0, p.color + p.alpha + ')');
+        grad.addColorStop(0.6, p.color + (p.alpha * 0.4) + ')');
+        grad.addColorStop(1, p.color + '0)');
+
+        ctxFog.beginPath();
+        ctxFog.fillStyle = grad;
+        ctxFog.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctxFog.fill();
+      });
+    }
+
+    function animate() {
+      drawStars();
+      drawFog();
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+      initSpaceCanvas();
+      initFogParticles();
+    });
+
+    initSpaceCanvas();
+    initFogParticles();
+    animate();
+
+    // --- LÓGICA DEL OJO Y FORMULARIO ---
+    const pupilGroup = document.getElementById('pupil-group');
+    const eyeWrapper = document.querySelector('.eye-wrapper');
+    let isMessageRevealed = false;
+
+    window.addEventListener('mousemove', (e) => {
+      if (isMessageRevealed) return;
+      const rect = eyeWrapper.getBoundingClientRect();
+      const eyeCenterX = rect.left + rect.width / 2;
+      const eyeCenterY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - eyeCenterX;
+      const deltaY = e.clientY - eyeCenterY;
+      const angle = Math.atan2(deltaY, deltaX);
+      const distance = Math.min(Math.hypot(deltaX, deltaY) / 12, 12);
+
+      pupilGroup.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      if (!isMessageRevealed) {
+        eyeWrapper.classList.add('closed');
+      }
+    });
+
+    document.addEventListener('mouseenter', () => {
+      if (!isMessageRevealed) {
+        eyeWrapper.classList.remove('closed');
+      }
+    });
+
+    const mensajes = {
+      "xd-67": "Si yo puse esto tú puedes poner cualquier código.",
+      "cs-29": "Soy Carlos Serrano, creador de esta página web y cofundador en compañía de Samuel y Edward de ARCANUM.",
+      "sb-05": "Soy Samuel Bolívar, cofundador en compañía de Carlos y Edward de ARCANUM, aporto con muchas ideas y compromiso.",
+      "em-29": "Soy Edward Moncada, cofundador en compañía de Carlos y Samuel de ARCANUM, soy emo y aporto con muchas ideas.",
+      "ce-01": "Soy Carlos Escobar, metido de colada, aporto con nada (supuestamente con el marketing).",
+      "vm-15": "Tengo un culo bien grande y soy adicta a Arda Güler."
+    };
+
+    const unlockForm = document.getElementById('unlockForm');
+    const formContainer = document.getElementById('form-container');
+    const messageContainer = document.getElementById('message-container');
+    const revealedMessage = document.getElementById('revealedMessage');
+    const errorMsg = document.getElementById('errorMsg');
+    const backBtn = document.getElementById('backBtn');
+    const codeInput = document.getElementById('codeInput');
+    const cardTitle = document.getElementById('cardTitle');
+    const cardSubtitle = document.getElementById('cardSubtitle');
+
+    unlockForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = codeInput.value.trim().toLowerCase();
+
+      if (mensajes.hasOwnProperty(input)) {
+        isMessageRevealed = true;
+        document.body.classList.add('revealed');
+        eyeWrapper.classList.remove('closed');
+
+        pupilGroup.style.transform = 'translate(0px, 12px)';
+
+        revealedMessage.textContent = mensajes[input];
+        formContainer.classList.add('hide');
+        messageContainer.classList.add('show');
+        cardTitle.textContent = 'MENSAJE REVELADO';
+        cardSubtitle.textContent = 'Este secreto fue guardado especialmente para ti.';
+        errorMsg.textContent = '';
+      } else {
+        errorMsg.textContent = 'Código incorrecto. Verifica tu dije e inténtalo de nuevo.';
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      isMessageRevealed = false;
+      document.body.classList.remove('revealed');
+
+      pupilGroup.style.transform = 'translate(0px, 0px)';
+
+      messageContainer.classList.remove('show');
+      formContainer.classList.remove('hide');
+      cardTitle.textContent = 'DESBLOQUEA EL MENSAJE';
+      cardSubtitle.textContent = 'Ingresa el código o contraseña grabado en tu dije para revelar la historia que oculta.';
+      codeInput.value = '';
+    });
+  </script>
+</body>
+</html>
