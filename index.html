@@ -32,13 +32,20 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       color: var(--text-main);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
-      overflow: hidden;
+      padding: 20px 16px 40px;
+      overflow-x: hidden;
+      overflow-y: auto;
       position: relative;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    html {
+      overflow-x: hidden;
+      background-color: var(--bg-dark);
     }
 
     /* Viñeta para oscurecer bordes */
@@ -61,7 +68,7 @@
 
     /* Canvas para Estrellas y Niebla */
     #space-canvas, #fog-canvas {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
@@ -93,6 +100,95 @@
       align-items: center;
       width: 100%;
       max-width: 440px;
+      margin: auto 0;
+    }
+
+    /* Escenario a pantalla completa: el pie de pagina queda fuera de vista hasta deslizar */
+    .stage {
+      width: 100%;
+      min-height: calc(100vh - 20px);
+      min-height: calc(100dvh - 20px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .site-footer {
+      position: relative;
+      z-index: 4;
+      width: 100%;
+      max-width: 440px;
+      margin-top: 1.5rem;
+      padding: 0 1rem;
+      text-align: center;
+    }
+
+    .footer-divider {
+      width: 60px;
+      height: 1px;
+      margin: 0 auto 2rem;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .site-footer h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      margin-bottom: 1.1rem;
+    }
+
+    .site-footer .founders-title {
+      margin-top: 2.2rem;
+    }
+
+    .site-footer ul {
+      list-style: none;
+    }
+
+    .contact-list li + li {
+      margin-top: 0.8rem;
+    }
+
+    .contact-list a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.92rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: 10px;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .contact-list a:hover {
+      background: rgba(212, 175, 55, 0.08);
+      color: var(--gold-hover);
+    }
+
+    .contact-list svg {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      color: var(--gold);
+    }
+
+    .contact-list span {
+      color: var(--text-muted);
+    }
+
+    .contact-list strong {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .founders-list li {
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      line-height: 2;
     }
 
     .brand-header {
@@ -319,10 +415,11 @@
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 600;
-      font-size: 1.45rem;
-      line-height: 1.75;
+      font-size: clamp(1.15rem, 5vw, 1.45rem);
+      line-height: 1.7;
       color: #ffffff;
       white-space: pre-wrap;
+      overflow-wrap: anywhere;
       margin-bottom: 1.8rem;
       text-shadow: 0 0 16px rgba(255, 255, 255, 1), 0 0 32px rgba(212, 175, 55, 0.8);
     }
@@ -341,6 +438,18 @@
       transition: all 0.25s ease;
     }
 
+    @media (max-width: 480px) {
+      .card {
+        padding: 1.8rem 1.25rem;
+      }
+      .brand-logo-svg {
+        width: 130px;
+      }
+      .brand-header {
+        margin-bottom: 1rem;
+      }
+    }
+
     .btn-secondary:hover {
       background: rgba(212, 175, 55, 0.08);
       border-color: var(--gold);
@@ -353,6 +462,7 @@
   <canvas id="space-canvas"></canvas>
   <canvas id="fog-canvas"></canvas>
 
+  <div class="stage">
   <div class="content-wrapper">
     
     <header class="brand-header">
@@ -447,6 +557,41 @@
     </main>
 
   </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-divider"></div>
+
+    <h3>DATOS DE CONTACTO</h3>
+    <ul class="contact-list">
+      <li>
+        <a href="https://wa.me/573001643036" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 21.5h-.01a9.45 9.45 0 0 1-4.82-1.32l-.35-.2-3.58.94.96-3.49-.23-.36a9.43 9.43 0 0 1-1.45-5.03c0-5.21 4.24-9.45 9.46-9.45 2.52 0 4.9.99 6.68 2.77a9.4 9.4 0 0 1 2.76 6.68c0 5.21-4.24 9.46-9.42 9.46zM20.52 3.45A11.35 11.35 0 0 0 12.04 0C5.78 0 .69 5.09.69 11.35c0 2 .52 3.95 1.52 5.67L.6 23l6.1-1.6a11.34 11.34 0 0 0 5.34 1.36h.01c6.26 0 11.35-5.09 11.35-11.35 0-3.03-1.18-5.88-3.31-8.01z" transform="translate(.4 .5) scale(.97)"/>
+          </svg>
+          <span>WhatsApp</span><strong>3001643036</strong>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.instagram.com/arcanumemp" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+          <span>Instagram</span><strong>@arcanumemp</strong>
+        </a>
+      </li>
+    </ul>
+
+    <h3 class="founders-title">FUNDADORES</h3>
+    <ul class="founders-list">
+      <li>CARLOS SERRANO</li>
+      <li>SAMUEL BOLIVAR</li>
+      <li>EDWARD MONCADA</li>
+      <li>CARLOS ESCOBAR</li>
+    </ul>
+  </footer>
 
   <script>
     // --- CANVAS DE ESTRELLAS MÁS DINÁMICAS ---
@@ -547,7 +692,10 @@
       requestAnimationFrame(animate);
     }
 
+    let lastWidth = window.innerWidth;
     window.addEventListener('resize', () => {
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
       initSpaceCanvas();
       initFogParticles();
     });
@@ -592,8 +740,17 @@
       "sb-05": "Soy Samuel Bolívar, cofundador en compañía de Carlos y Edward de ARCANUM, aporto con muchas ideas y compromiso.",
       "em-29": "Soy Edward Moncada, cofundador en compañía de Carlos y Samuel de ARCANUM, soy emo y aporto con muchas ideas.",
       "ce-01": "Soy Carlos Escobar, metido de colada, aporto con nada (supuestamente con el marketing).",
-      "vm-15": "Tengo un culo bien grande y soy adicta a Arda Güler."
-    
+      "vm-15": "Tengo un culo bien grande y soy adicta a Arda Güler.",
+      "tina": "Para mi pe cosita ❤️\n\nMi niña de pecas,\nmi cosa preciosa,\nsi supieras lo bonita que te ves\ncuando te ríes nerviosa.\n\nTienes el sol en la carita,\nregadito como estrellitas,\ny yo, que nunca pedí nada,\nahora le pido a la vida\nque me deje contarlas todas,\ndespacito, toda la vida.\n\nSi estás lejos, te pienso,\nsi estás cerca, te admiro,\nsi te ríes, me salvas.\n\nTú no sabes, mi pecosa,\npero desde que llegaste,\nmi mundo tiene tu nombre\ny tu carita de pecas. \n \nAunque aveces peleamos mucho , sabes que te amo soy muy afortunado de tenerte ami lado contigo soy feliz eres la mujer que admiro eres mi picosita y mi Rapunzel sin ti mi mundo sería feo y cruel te amo con todo mi corazón ❤️🦭 \nATT : Su cascarrabias",
+      "0409": "Mamá, nunca te rindas, eres una mujer fuerte, valiente y maravillosa. Aunque la vida tenga días difíciles, recuerda que eres capaz de superar cualquier obstáculo. Nunca dejes de luchar por tus sueños y de sonreír. Que Dios te dé fuerzas y bendiciones siempre. Te amo mucho, mamá, y deseo verte siempre feliz. 🥹❤️",
+      "ac": "Amor un pequeño detalle con un significado infinito.\nQue estas manillas nos recuerden que, aunque el tiempo pase y la distancia nos separe, siempre habrá algo bonito que nos una. Que cada vez que las miremos recordemos los momentos compartidos, el cariño sincero y la conexión tan especial que existe entre nosotros.\nNo son solo unas manillas, son un símbolo de cariño, unión y promesas que se lleva en el corazón. \nSin importar dónde estemos siempre encontremos la manera de estar cerquita el uno del otro. Te amo mucho ✨❤️‍🩹🫶🏻",
+      "1310": "Eres capaz de eso y mucho más , sigue adelante",
+      "051126": "Amor, aunque te mereces esto y mucho más. Esto es para que, más que darte un detalle bonito, me recuerdes siempre que lo veas y recuerdes todo el amor que te tengo. Podrá no ser el mejor del mundo, pero espero que estas palabras llenen tu corazón tanto como el mío",
+      "19801": "Todo llega a su tiempo",
+      "13/10": "Te quiero muchísimo.\nEste detalle es un pequeño recordatorio de mi cariño por ti, y espero que cuando lo veas, no importa la ocasión, pienses en el momento tan bonito y en el cariño que te tengo. \nEspero te guste tanto como a mi, y que siempre mi Dios y la Virgen te cuiden en tu camino",
+      "sa-09": "“Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones y vuestros pensamientos en Cristo Jesús.”\nFILIPENSES 4:7",
+      "161019": "Para mi crespa favorita",
+      "1216": "Mami te extrañe mucho  ,tú eres todo para mi;mi mejor amiga y mi alma entera atentamente María Paz"
     };
 
     const unlockForm = document.getElementById('unlockForm');
@@ -623,6 +780,7 @@
         cardTitle.textContent = 'MENSAJE REVELADO';
         cardSubtitle.textContent = 'Este secreto fue guardado especialmente para ti.';
         errorMsg.textContent = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         errorMsg.textContent = 'Código incorrecto. Verifica tu dije e inténtalo de nuevo.';
       }
@@ -639,6 +797,7 @@
       cardTitle.textContent = 'DESBLOQUEA EL MENSAJE';
       cardSubtitle.textContent = 'Ingresa el código o contraseña grabado en tu dije para revelar la historia que oculta.';
       codeInput.value = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 </body>
